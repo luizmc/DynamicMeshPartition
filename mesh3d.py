@@ -67,16 +67,7 @@ def create_3d_mesh(nx=8, ny=8, nz=3, active_intervals=None):
                     # Ajusta o intervalo final se necessário
                     j_end_adjusted = min(j_end, ny)
                     mesh[i, j_start:j_end_adjusted, k] = 1  # Ativa apenas as células dentro dos intervalos
-    
-    # for k, layers in active_intervals.items():
-    #     for i, intervals in layers.items():
-    #         for j_start, j_end in intervals:
-    #             # Verifica se os índices estão dentro dos limites da malha
-    #             if i < nx and k < nz and j_end < ny:
-    #                 # Ajusta o intervalo final se necessário
-    #                 j_end_adjusted = min(j_end, ny)
-    #                 mesh[i, j_start:j_end_adjusted, k] = 1  # Ativa apenas as células dentro dos intervalos
-    
+       
     return mesh
 
 

@@ -1,6 +1,4 @@
 """
-Demonstração de criação, refinamento e visualização de malhas 3D com documentação Sphinx.
-
 Este script utiliza o módulo mesh3d para operações com malhas tridimensionais, incluindo:
 
     Criação de malhas lógicas
@@ -43,8 +41,6 @@ def main():
     5. Visualização dos resultados
     """
 
-# Criação da malha base ====================================================
-    mesh = m3d.create_3d_mesh()
     """
     Cria malha 3D inicial usando configurações padrão.
 
@@ -57,18 +53,9 @@ def main():
     Ver também:
         :func:`mesh3d.create_3d_mesh` para detalhes de implementação
     """
+    mesh = m3d.create_3d_mesh()
 
-    # Definição de refinamentos ================================================
-    refinement_regions = {
-        1: {
-            3: [(3, 4, 2, 2, 1)],
-            4: [(3, 4, 2, 2, 1)]
-        },
-        2: {
-            3: [(3, 4, 2, 2, 1)],
-            4: [(3, 4, 2, 2, 1)]
-        }
-    }
+
     """
     Dicionário de refinamentos com estrutura:
 
@@ -88,8 +75,17 @@ def main():
         - factor_k: Fator de refinamento em Z
     """
 
-    # Aplicação dos refinamentos ===============================================
-    refined_mesh = m3d.refine_mesh(mesh, refinement_regions)
+    refinement_regions = {
+        1: {
+            3: [(3, 4, 2, 2, 1)],
+            4: [(3, 4, 2, 2, 1)]
+        },
+        2: {
+            3: [(3, 4, 2, 2, 1)],
+            4: [(3, 4, 2, 2, 1)]
+        }
+    }
+
     """
     Aplica refinamentos na malha original.
 
@@ -110,8 +106,8 @@ def main():
         :func:`mesh3d.refine_mesh` para detalhes do algoritmo
     """
 
-    # Cálculo dos pesos ========================================================
-    weight_array = m3d.compute_weight_array(refined_mesh)
+    refined_mesh = m3d.refine_mesh(mesh, refinement_regions)
+
     """
     Calcula projeção 2D dos pesos por soma ao longo do eixo Z.
 
@@ -123,15 +119,21 @@ def main():
     Ver também:
         :func:`mesh3d.compute_weight_array` para detalhes matemáticos
     """
+    
+    weight_array = m3d.compute_weight_array(refined_mesh)
 
-    # Saída de dados ===========================================================
-    print("Malha Refinada (Camada Z=0):")
-    print(refined_mesh[:,:,0])
+
+    # Saída de dados simplificada
+    # ===========================================================
+
+    print("Malha Refinada (3 Camadas Z):")
+    for i in range(3):
+        print("\n Camada Z=",i)
+        print(refined_mesh[:,:,0])
+
     print("\nArray de Pesos:")
     print(weight_array)
 
-    # Visualização gráfica =====================================================
-    m3d.plot_both_mesh_views(refined_mesh)
     """
     Gera visualização comparativa da malha:
 
@@ -140,15 +142,19 @@ def main():
 
     Ver também:
         :func:`mesh3d.plot_both_mesh_views` para detalhes de implementação gráfica
-    """
+    """   
+    
+    m3d.plot_both_mesh_views(refined_mesh)
 
-    m3d.plot_weights(weight_array)
     """
     Exibe matriz de pesos como heatmap 2D com valores numéricos
 
     Ver também:
         :func:`mesh3d.plot_weights` para opções de customização visual
     """
+
+    m3d.plot_weights(weight_array)
+
 
     plt.show()
 
