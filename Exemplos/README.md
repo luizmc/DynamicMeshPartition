@@ -1,4 +1,4 @@
-# Repositório de Visualização Computacional
+# Casos de Uso
 
 Coleção de scripts para análise e visualização de malhas 3D e transformações de inércia, usa o pacote mesh3d.
 
@@ -6,7 +6,7 @@ Coleção de scripts para análise e visualização de malhas 3D e transformaç�
 
 ## 🗂 Arquivos Principais
 
-### 1. `Exemplo_inerciacompontos.py`
+### `Exemplo_inerciacompontos.py`
 
 **Objetivo**  
 
@@ -25,7 +25,45 @@ Calcular a **matriz de inércia**, **centro de massa**, **momentos principais** 
 python Exemplo_inerciacompontos.py
 ```
 
-### 2. Exemplo_plot3D_momentoInercia.py
+### `Exemplo_plot2D_momentoInercia.py`
+
+**Objetivo**
+
+Ilustrar a transformação de um círculo unitário em elipse usando matriz de inércia 2D.
+
+**Funcionalidades**:
+
+- Aplicação de transformação linear à matriz de inércia
+- Visualização dos eixos principais da elipse
+- Configuração de gráfico com proporção isométrica
+
+**Execução**:
+
+```bash
+python Exemplo_plot2D_momentoInercia.py
+```
+
+### `Exemplo_plot3D_malhas_refinamentos_weights.py`
+
+**Objetivo**
+
+Manipular e visualizar malhas 3D com refinamentos locais e projeções de peso.
+
+**Funcionalidades**:
+
+- Criação de malha 3D base (8x8x3)
+- Refinamento em regiões específicas (camadas Z, linhas X/Y)
+- Cálculo de projeção 2D de pesos
+- Visualização 3D interativa e heatmap 2D
+
+**Execução**:
+
+```bash
+
+python Exemplo_plot3D_malhas_refinamentos_weights.py
+```
+
+### `Exemplo_plot3D_momentoInercia.py`
 
 **Objetivo**
 
@@ -45,44 +83,6 @@ Demonstrar a deformação de uma esfera unitária em um elipsoide via matriz de 
 python Exemplo_plot3D_momentoInercia.py
 ```
 
-### 3. Exemplo_plot2D_momentoInercia.py
-
-**Objetivo**
-
-Ilustrar a transformação de um círculo unitário em elipse usando matriz de inércia 2D.
-
-**Funcionalidades**:
-
-- Aplicação de transformação linear à matriz de inércia
-- Visualização dos eixos principais da elipse
-- Configuração de gráfico com proporção isométrica
-
-**Execução**:
-
-```bash
-python Exemplo_plot2D_momentoInercia.py
-```
-
-### 4. Example_plot3D_malhas_refinamentos_weights.py
-
-**Objetivo**
-
-Manipular e visualizar malhas 3D com refinamentos locais e projeções de peso.
-
-**Funcionalidades**:
-
-- Criação de malha 3D base (8x8x3)
-- Refinamento em regiões específicas (camadas Z, linhas X/Y)
-- Cálculo de projeção 2D de pesos
-- Visualização 3D interativa e heatmap 2D
-
-**Execução**:
-
-```bash
-
-python Example_plot3D_malhas_refinamentos_weights.py
-```
-
 ---
 
 ## ⚙️ Pré-requisitos
@@ -98,14 +98,18 @@ python Example_plot3D_malhas_refinamentos_weights.py
 
 - **Módulo customizado**: mesh3d.py (incluído no repositório).
 
+---
+
 ## 📊 Saídas Esperadas
 
 | Script | Descrição da Visualização |
 |--------|---------------------------|
 | `Exemplo_inerciacompontos.py`      | Resultados numéricos no console: centro de massa, matriz de inércia, autovalores e autovetores|
-| `Exemplo_plot3D_momentoInercia.py` | Dois subplots 3D: esfera (azul) e elipsoide (vermelho) com eixos principais |
 | `Exemplo_plot2D_momentoInercia.py` | Gráfico 2D comparando círculo (linha tracejada) e elipse (linha sólida) |
-| `Example_plot3D_malhas_refinamentos_weights.py` | Malha 3D refinada + matriz de pesos colorida |
+| `Exemplo_plot3D_malhas_refinamentos_weights.py` | Malha 3D refinada + matriz de pesos colorida |
+| `Exemplo_plot3D_momentoInercia.py` | Dois subplots 3D: esfera (azul) e elipsoide (vermelho) com eixos principais |
+
+---
 
 ## 💡 Dicas de Uso
 
@@ -118,6 +122,8 @@ python Example_plot3D_malhas_refinamentos_weights.py
     - Ajuste refinement_regions no script de malhas para testar refinamentos personalizados.
 
 4. **Debug**: Verifique a saída do console para valores numéricos das malhas refinadas.
+
+---
 
 ## 📄 Notas Técnicas
 
