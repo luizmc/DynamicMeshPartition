@@ -2,20 +2,18 @@
 
 Coleção de scripts para análise e visualização de malhas 3D e transformações de inércia, usa o pacote mesh3d.
 
----
-
 ## 🗂 Arquivos Principais
 
 ### `Exemplo_inerciacompontos.py`
 
 **Objetivo**  
 
-Calcular a **matriz de inércia**, **centro de massa**, **momentos principais** e **eixos principais** para um conjunto de pontos com pesos.
+Calcular a **matriz de inércia**, **centro de massa**, **momentos principais** e **eixos principais** para um conjunto de pontos em duas dimensões com pesos.
 
 **Funcionalidades**:
 
 - Cálculo numérico do centro de massa a partir de coordenadas e pesos.
-- Geração da matriz de inércia 3x3 (assumindo pontos no plano XY).
+- Geração da matriz de inércia 2x2 (assumindo pontos no plano XY).
 - Diagonalização da matriz para obtenção de autovalores (momentos) e autovetores (eixos).
 - Saída formatada dos resultados no console.
 
@@ -59,7 +57,6 @@ Manipular e visualizar malhas 3D com refinamentos locais e projeções de peso.
 **Execução**:
 
 ```bash
-
 python Exemplo_plot3D_malhas_refinamentos_weights.py
 ```
 
@@ -83,8 +80,6 @@ Demonstrar a deformação de uma esfera unitária em um elipsoide via matriz de 
 python Exemplo_plot3D_momentoInercia.py
 ```
 
----
-
 ## ⚙️ Pré-requisitos
 
 - **Python 3.7+**
@@ -92,13 +87,10 @@ python Exemplo_plot3D_momentoInercia.py
 - **Bibliotecas**:
 
 ```bash
-
     pip install numpy matplotlib numpy matplotlib os sys mpl_toolkits
 ```
 
 - **Módulo customizado**: mesh3d.py (incluído no repositório).
-
----
 
 ## 📊 Saídas Esperadas
 
@@ -108,8 +100,6 @@ python Exemplo_plot3D_momentoInercia.py
 | `Exemplo_plot2D_momentoInercia.py` | Gráfico 2D comparando círculo (linha tracejada) e elipse (linha sólida) |
 | `Exemplo_plot3D_malhas_refinamentos_weights.py` | Malha 3D refinada + matriz de pesos colorida |
 | `Exemplo_plot3D_momentoInercia.py` | Dois subplots 3D: esfera (azul) e elipsoide (vermelho) com eixos principais |
-
----
 
 ## 💡 Dicas de Uso
 
@@ -122,8 +112,6 @@ python Exemplo_plot3D_momentoInercia.py
     - Ajuste refinement_regions no script de malhas para testar refinamentos personalizados.
 
 4. **Debug**: Verifique a saída do console para valores numéricos das malhas refinadas.
-
----
 
 ## 📄 Notas Técnicas
 
