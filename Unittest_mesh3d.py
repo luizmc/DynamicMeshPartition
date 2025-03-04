@@ -1,5 +1,6 @@
 import unittest
 import numpy as np
+from numpy.testing import assert_array_almost_equal
 import matplotlib.pyplot as plt
 from matplotlib import figure, axes
 from mpl_toolkits.mplot3d.art3d import Poly3DCollection
@@ -415,7 +416,121 @@ class TestMesh3D(unittest.TestCase):
         finally:
             # Restore standard output
             sys.stdout = original_stdout
-            plt.ion()  # Turn interactive mode back on
+            plt.ion()  # Turn interactive mode back on    
+    def test_single_point(self):
+        """Teste com um único ponto na origem."""
+        points = np.array([[0, 0, 1]])  # Um ponto na origem com peso 1
+        I, center = mesh3d.compute_inertia_matrix_from_points(points)
+        
+        # Centro de massa deve ser na origem
+        self.assertEqual(center, (0, 0))
+        
+        # Matriz de inércia deve ser zeros
+        expected_I = np.zeros((2, 2))
+        assert_array_almost_equal(I, expected_I)
+    
+    def test_two_equal_points(self):
+        """Teste com dois pontos iguais."""
+        points = np.array([[1, 1, 1], [1, 1, 1]])  # Dois pontos idênticos
+        I, center = mesh3d.compute_inertia_matrix_from_points(points)
+        
+        # Centro de massa deve ser no ponto (1, 1)
+        self.assertEqual(center, (1, 1))
+        
+        # Matriz de inércia deve ser zeros (ambos os pontos estão no centro de massa)
+        expected_I = np.zeros((2, 2))
+        assert_array_almost_equal(I, expected_I)
+    
+    def test_symmetric_configuration(self):
+        """Teste com configuração simétrica de pontos."""
+        # Pontos formando um quadrado de lado 2 centrado na origem
+        points = np.array([
+            [-1, -1, 1],  # Ponto inferior esquerdo
+            [1, -1, 1],   # Ponto inferior direito
+            [-1, 1, 1],   # Ponto superior esquerdo
+            [1, 1, 1]     # Ponto superior direito
+        ])
+        
+        I, center = mesh3d.compute_inertia_matrix_from_points(points)
+        
+        # Centro de massa deve ser na origem
+        assert_array_almost_equal(center, (0, 0))
+        
+        # Para configuração simétrica, os termos não diagonais devem ser zero
+        # e os termos diagonais devem ser iguais
+        self.assertAlmostEqual(I[0, 1], 0)
+        self.assertAlmostEqual(I[1, 0], 0)
+        self.assertAlmostEqual(I[0, 0], I[1, 1])
+        
+        # Valor esperado para o momento de inércia (2 unidades de massa * 2 unidades de distância²)
+        expected_diagonal = 4
+        self.assertAlmostEqual(I[0, 0], expected_diagonal)
+    
+    def test_different_weights(self):
+        """Teste com pontos de pesos diferentes."""
+        # Dois pontos com pesos diferentes
+        points = np.array([
+            [0, 0, 1],   # Ponto na origem com peso 1
+            [2, 0, 3]    # Ponto em (2,0) com peso 3
+        ])
+        
+        I, center = mesh3d.compute_inertia_matrix_from_points(points)
+        
+        # Centro de massa: (2*3 + 0*1)/(3+1) = 6/4 = 1.5 no eixo x e 0 no eixo y
+        expected_center = (1.5, 0)
+        assert_array_almost_equal(center, expected_center)
+        
+        # Cálculo manual da matriz de inércia
+        # I_xx = Σ w_i * (y_i - y_bar)² = 1*0² + 3*0² = 0
+        # I_yy = Σ w_i * (x_i - x_bar)² = 1*(0-1.5)² + 3*(2-1.5)² = 1*2.25 + 3*0.25 = 2.25 + 0.75 = 3
+        # I_xy = -Σ w_i * (x_i - x_bar)*(y_i - y_bar) = -[1*(0-1.5)*(0-0) + 3*(2-1.5)*(0-0)] = 0
+        expected_I = np.array([[0, 0], [0, 3]])
+        assert_array_almost_equal(I, expected_I)
+    
+    def test_general_case(self):
+        """Teste com uma configuração de pontos genérica."""
+        points = np.array([
+            [0, 0, 2],
+            [1, 2, 3],
+            [3, 1, 1]
+        ])
+        
+        I, center = mesh3d.compute_inertia_matrix_from_points(points)
+        
+        # Cálculo manual do centro de massa
+        total_weight = 2 + 3 + 1
+        x_bar = (0*2 + 1*3 + 3*1) / total_weight
+        y_bar = (0*2 + 2*3 + 1*1) / total_weight
+        expected_center = (x_bar, y_bar)
+        
+        # Verificando centro de massa
+        assert_array_almost_equal(center, expected_center)
+        
+        # Propriedades da matriz de inércia
+        # 1. Deve ser simétrica
+        self.assertAlmostEqual(I[0, 1], I[1, 0])
+        
+        # 2. O traço da matriz deve ser positivo ou zero
+        self.assertGreaterEqual(np.trace(I), 0)
+        
+        # 3. O determinante deve ser não-negativo
+        self.assertGreaterEqual(np.linalg.det(I), 0)
+    
+    def test_zero_weights(self):
+        """Teste com pontos de peso zero."""
+        points = np.array([
+            [1, 2, 0],
+            [3, 4, 0]
+        ])
+        
+        I, center = mesh3d.compute_inertia_matrix_from_points(points)
+        
+        # Centro de massa deve ser (0, 0) quando todos os pesos são zero
+        self.assertEqual(center, (0, 0))
+        
+        # Matriz de inércia deve ser zeros
+        expected_I = np.zeros((2, 2))
+        assert_array_almost_equal(I, expected_I)
 
 if __name__ == '__main__':
     unittest.main()

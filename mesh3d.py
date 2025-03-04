@@ -650,6 +650,42 @@ def compute_inertia_matrix_from_grid(weight_matrix):
 
     return I, (x_bar, y_bar)    
 
+def compute_inertia_matrix_from_points(points):
+    """
+    Calcula a matriz de inércia e o centro de massa a partir de um conjunto de pontos 2D com pesos.
+    
+    Parâmetros:
+    - points: Array de formato (n, 3) onde cada linha representa um ponto [x, y, peso]
+    
+    Retorna:
+    - I: Matriz de inércia 2x2
+    - center_of_mass: Tupla (x_bar, y_bar) com as coordenadas do centro de massa
+    """
+    points = np.array(points)  # Garante que os pontos estão como um array NumPy
+    
+    # Extrai as coordenadas x, y e os pesos
+    x_coords = points[:, 0]
+    y_coords = points[:, 1]
+    weights = points[:, 2]
+    
+    # Calcula o centro de massa
+    total_weight = np.sum(weights)
+    if total_weight == 0:
+        x_bar, y_bar = 0, 0  # Valor padrão apropriado
+    else:
+        x_bar = np.sum(weights * x_coords) / total_weight
+        y_bar = np.sum(weights * y_coords) / total_weight
+    
+    # Construção da matriz de inércia
+    I_xx = np.sum(weights * (y_coords - y_bar) ** 2)  # Momento de inércia em relação ao eixo x
+    I_yy = np.sum(weights * (x_coords - x_bar) ** 2)  # Momento de inércia em relação ao eixo y
+    I_xy = -np.sum(weights * (x_coords - x_bar) * (y_coords - y_bar))  # Produto de inércia
+    
+    I = np.array([[I_xx, I_xy],
+                  [I_xy, I_yy]])
+    
+    return I, (x_bar, y_bar)
+
 def calculate_principal_moments(inertia_matrix):
     """
     Calcula os momentos principais de inércia e os eixos principais a partir de uma matriz de inércia.
