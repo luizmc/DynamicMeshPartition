@@ -17,8 +17,11 @@ import matplotlib.pyplot as plt
 current_dir = os.path.dirname(os.path.abspath(__file__))
 # Sobe um nível para acessar o diretório pai
 parent_dir = os.path.dirname(current_dir)
-# Adiciona o diretório pai ao sys.path
-sys.path.append(parent_dir)
+# Define o caminho do diretório 'source'
+source_dir = os.path.join(parent_dir, "source")
+# Adiciona o diretório 'source' ao sys.path
+sys.path.append(source_dir)
+# Agora você pode importar os módulos do diretório 'source'
 import mesh3d as m3d
 
 """

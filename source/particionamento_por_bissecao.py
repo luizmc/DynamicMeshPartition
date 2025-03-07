@@ -2,38 +2,12 @@ import math
 import random
 import itertools
 import numpy as np
+import mesh3d as m3d
 
-def generate_input_dictionary_old(m, p):
+def generate_input_synthetic_dictionary(m, p):
     """
-    Gera um dicionário com coordenadas únicas e pesos aleatórios.
-    
-    Parameters
-    ----------
-    m : int
-        Primeira dimensão (variação de 0 a m-1).
-    p : int
-        Segunda dimensão (variação de 0 a p-1).
-    
-    Returns
-    -------
-    dict
-        Dicionário com coordenadas como chaves (tuplas (i,j)) e pesos aleatórios como valores.
-    """
-    # Gera todas as combinações possíveis de coordenadas
-    all_coordinates = list(itertools.product(range(m), range(p)))
-    
-    # Escolhe um número aleatório de coordenadas (entre metade e todas)
-    num_coords = random.randint(len(all_coordinates) // 2, len(all_coordinates))
-    coordinates = random.sample(all_coordinates, num_coords)
-    
-    # Cria o dicionário com coordenadas e pesos aleatórios
-    input_dict = {coord: random.randint(1, 8) for coord in coordinates}
-    
-    return input_dict
-
-def generate_input_dictionary(m, p):
-    """
-    Gera um dicionário com todas as coordenadas possíveis e pesos aleatórios.
+    Gera um dicionário sintético com todas as coordenadas possíveis e pesos aleatórios.
+    Ele representa um mapas bidimensional de pesos vindos de uma malha tridimensional projetada neste mapa
     
     Parameters
     ----------
@@ -54,81 +28,12 @@ def generate_input_dictionary(m, p):
     # Inicializa o dicionário com todas as coordenadas tendo peso zero
     input_dict = {coord: 0 for coord in all_coordinates}
     
-    # Preenche aproximadamente 70% das entradas do dicionário com pesos aleatórios
+    # Preenche aproximadamente 60% das entradas do dicionário com pesos aleatórios
     for coord in all_coordinates:
-        if random.random() < 0.6:  # 70% de chance de alterar o peso
+        if random.random() < 0.6:  # 60% de chance de alterar o peso
             input_dict[coord] = random.randint(1, 8)
     
     return input_dict
-
-def compute_inertia_matrix_from_points(points):
-    """
-    Calcula a matriz de inércia e o centro de massa a partir de um conjunto de pontos 2D com pesos.
-    
-    Parameters
-    ----------
-    points : array-like
-        Array de formato (n, 3) onde cada linha representa um ponto [x, y, peso].
-    
-    Returns
-    -------
-    tuple
-        (I, center_of_mass) onde:
-            - I: Matriz de inércia 2x2.
-            - center_of_mass: Tupla (x_bar, y_bar) com as coordenadas do centro de massa.
-    """
-    points = np.array(points)  # Garante que os pontos estão como um array NumPy
-    
-    # Extrai as coordenadas x, y e os pesos
-    x_coords = points[:, 0]
-    y_coords = points[:, 1]
-    weights = points[:, 2]
-    
-    # Calcula o centro de massa
-    total_weight = np.sum(weights)
-    if total_weight == 0:
-        x_bar, y_bar = 0, 0  # Valor padrão apropriado
-    else:
-        x_bar = np.sum(weights * x_coords) / total_weight
-        y_bar = np.sum(weights * y_coords) / total_weight
-    
-    # Construção da matriz de inércia
-    I_xx = np.sum(weights * (y_coords - y_bar) ** 2)  # Momento de inércia em relação ao eixo x
-    I_yy = np.sum(weights * (x_coords - x_bar) ** 2)  # Momento de inércia em relação ao eixo y
-    I_xy = -np.sum(weights * (x_coords - x_bar) * (y_coords - y_bar))  # Produto de inércia
-    
-    I = np.array([[I_xx, I_xy],
-                  [I_xy, I_yy]])
-    
-    return I, (x_bar, y_bar)
-
-def calculate_principal_moments(inertia_matrix):
-    """
-    Calcula os momentos principais de inércia e os eixos principais a partir de uma matriz de inércia.
-    
-    Esta função decompõe a matriz de inércia em seus valores próprios (momentos principais) 
-    e vetores próprios (eixos principais).
-    
-    Parameters
-    ----------
-    inertia_matrix : numpy.ndarray
-        Matriz de inércia simétrica (2x2 ou 3x3).
-    
-    Returns
-    -------
-    tuple
-        (principal_moments, principal_axes) onde:
-            - principal_moments: numpy.ndarray - Momentos principais de inércia (valores próprios).
-            - principal_axes: numpy.ndarray - Eixos principais (vetores próprios), cada coluna é um eixo.
-    """
-    # Verifica se a matriz é simétrica (propriedade importante para matrizes de inércia)
-    if not np.allclose(inertia_matrix, inertia_matrix.T):
-        raise ValueError("A matriz de inércia deve ser simétrica")
-    
-    # Calcula os valores próprios (momentos principais) e vetores próprios (eixos principais)
-    principal_moments, principal_axes = np.linalg.eig(inertia_matrix)
-    
-    return principal_moments, principal_axes
 
 def normalize_vectors(vectors):
     """
@@ -221,7 +126,6 @@ def calculate_max_distance(projections):
     
     return max_distance
 
-
 def find_best_projection_and_division_balanced(input_dict, n1, n2):
     """
     Finds the best projection for dividing a set into two balanced, connected subsets.
@@ -244,10 +148,10 @@ def find_best_projection_and_division_balanced(input_dict, n1, n2):
     points = np.array([[coord[0], coord[1], weight] for coord, weight in input_dict.items()])
     
     # Calculate inertia matrix and center of mass
-    inertia_matrix, center_of_mass = compute_inertia_matrix_from_points(points)
+    inertia_matrix, center_of_mass = m3d.compute_inertia_matrix_from_points(points)
     
     # Calculate principal moments and principal axes
-    principal_moments, principal_axes = calculate_principal_moments(inertia_matrix)
+    principal_moments, principal_axes = m3d.calculate_principal_moments(inertia_matrix)
     
     # Normalize eigenvectors
     principal_axes = normalize_vectors(principal_axes)
@@ -428,85 +332,6 @@ def region_growing_partition(input_dict, n1, n2, sorted_coords):
   
     return first_subset, second_subset
 
-def find_best_projection_and_division_old(input_dict, n1, n2):
-    """
-    Encontra a melhor projeção para divisão do conjunto em dois subconjuntos.
-    
-    Parameters
-    ----------
-    input_dict : dict
-        Dicionário com coordenadas como chaves e pesos como valores.
-    n1 : int
-        Número de elementos desejados no primeiro subconjunto.
-    n2 : int
-        Número de elementos desejados no segundo subconjunto.
-    
-    Returns
-    -------
-    tuple
-        (first_subset, second_subset) ambos são dicionários.
-    """
-    # Converte o dicionário em um array
-    points = np.array([[coord[0], coord[1], weight] for coord, weight in input_dict.items()])
-    
-    # Calcular matriz de inércia e centro de massa
-    inertia_matrix, center_of_mass = compute_inertia_matrix_from_points(points)
-    
-    # Calcula momentos principais e eixos principais
-    principal_moments, principal_axes = calculate_principal_moments(inertia_matrix)
-    
-    # Normaliza os autovetores
-    principal_axes = normalize_vectors(principal_axes)
-    
-    # Projeta os pontos nos dois autovetores
-    projections1 = project_points_on_eigenvector(points, center_of_mass, principal_axes[:, 0])
-    projections2 = project_points_on_eigenvector(points, center_of_mass, principal_axes[:, 1])
-    
-    # Calcula a distância máxima para cada projeção
-    max_dist1 = calculate_max_distance(projections1)
-    max_dist2 = calculate_max_distance(projections2)
-    
-    # Escolhe a projeção com menor dispersão
-    if max_dist1 <= max_dist2:
-        chosen_projections = projections1
-    else:
-        chosen_projections = projections2
-    
-    # Ordena as projeções
-    # Primeiro calcula um valor escalar para ordenação (distância projetada do centro de massa)
-    sort_values = np.sqrt((chosen_projections[:, 3] - center_of_mass[0])**2 + 
-                          (chosen_projections[:, 4] - center_of_mass[1])**2)
-    
-    # Ordena os índices baseados nos valores de ordenação
-    sorted_indices = np.argsort(sort_values)
-    sorted_projections = chosen_projections[sorted_indices]
-    
-    # Recalcula mapeamento para o dicionário original
-    sorted_coords = [(int(sorted_projections[i, 0]), int(sorted_projections[i, 1])) 
-                      for i in range(sorted_projections.shape[0])]
-    
-    # Calcula os pesos acumulados
-    total_weight = np.sum([input_dict[coord] for coord in sorted_coords])
-    target_weight = (total_weight * n1) / (n1 + n2)
-    
-    # Encontra o índice de corte ótimo
-    cumulative_weights = np.zeros(len(sorted_coords))
-    for i in range(len(sorted_coords)):
-        cumulative_weights[i] = input_dict[sorted_coords[i]]
-        if i > 0:
-            cumulative_weights[i] += cumulative_weights[i-1]
-    
-    # Encontra o índice que minimiza a diferença com o peso alvo
-    weight_diffs = np.abs(cumulative_weights - target_weight)
-    cut_index = np.argmin(weight_diffs)
-    
-    # Divide os pontos em dois grupos
-    first_subset = {sorted_coords[i]: input_dict[sorted_coords[i]] for i in range(cut_index + 1)}
-    second_subset = {sorted_coords[i]: input_dict[sorted_coords[i]] for i in range(cut_index + 1, len(sorted_coords))}
-    
-    return first_subset, second_subset
-
-
 def recursive_binary_subset_division_balanced(input_dict, n_subsets=2, current_depth=0, binary_prefix=''):
     """
     Recursively divides a set of weighted coordinates into balanced, connected subsets.
@@ -558,63 +383,6 @@ def recursive_binary_subset_division_balanced(input_dict, n_subsets=2, current_d
         ))
     
     return result
-def recursive_binary_subset_division(input_dict, n_subsets=2, current_depth=0, binary_prefix=''):
-    """
-    Divide recursivamente um conjunto de coordenadas com pesos em subconjuntos baseados
-    em centro de massa e autovetores.
-    
-    Parameters
-    ----------
-    input_dict : dict
-        Dicionário de coordenadas e pesos.
-    n_subsets : int
-        Número total de subconjuntos desejados.
-    current_depth : int
-        Profundidade atual da recursão.
-    binary_prefix : str
-        Prefixo binário atual para identificação dos subconjuntos.
-    
-    Returns
-    -------
-    dict
-        Dicionário de subconjuntos identificados por strings binárias.
-    """
-    # Condição de parada: se n_subsets=1 ou profundidade máxima atingida
-    if n_subsets <= 1 or len(input_dict) <= 1:
-        return {binary_prefix: input_dict}
-    
-    # Calcula n1 e n2 (número de subconjuntos para cada metade)
-    if n_subsets % 2 == 0:
-        n1 = n2 = n_subsets // 2
-    else:
-        n1 = n_subsets // 2
-        n2 = n_subsets // 2 + 1
-    
-    # Divide o conjunto em dois subconjuntos baseados na matriz de inércia
-    first_subset, second_subset = find_best_projection_and_division(input_dict, n1, n2)
-    
-    # Chamadas recursivas para cada metade
-    result = {}
-    
-    # Só faz a chamada recursiva se o subconjunto tiver elementos
-    if first_subset:
-        result.update(recursive_binary_subset_division(
-            first_subset, 
-            n1, 
-            current_depth + 1, 
-            binary_prefix + '0'
-        ))
-    
-    if second_subset:
-        result.update(recursive_binary_subset_division(
-            second_subset, 
-            n2, 
-            current_depth + 1, 
-            binary_prefix + '1'
-        ))
-    
-    return result
-
 def evaluate_partition_quality(result, original_dict):
     """
     Avalia a qualidade da partição considerando equilibrio de pesos.
@@ -695,8 +463,8 @@ def main():
     test_cases = [
         (4, 3, 3),   # m = 4, p = 3, n_subsets = 3
         (5, 6, 4),   # m = 5, p = 6, n_subsets = 4
-        (3, 4, 2),    # m = 3, p = 4, n_subsets = 2
-        (20, 21, 6)    # m = 10, p = 13, n_subsets = 8
+        (3, 4, 2),   # m = 3, p = 4, n_subsets = 2
+        (10, 13, 5)  # m = 10, p = 13, n_subsets = 6
 
     ]
     
@@ -704,21 +472,8 @@ def main():
         print(f"\nDividindo coordenadas {m}x{p} em {n_subsets} subconjuntos:")
         
         # Gera o dicionário de entrada
-        input_dict = generate_input_dictionary(m, p)
-        # print(f"\n O dicionário original \n")
-        # # Ordenar as coordenadas
-        # sorted_coords = sorted(input_dict.keys())
+        input_dict = generate_input_synthetic_dictionary(m, p)
 
-        # # Agrupar por i (primeira coordenada) e formatar a saída
-        # for i, group in itertools.groupby(sorted_coords, key=lambda coord: coord[0]):
-        #     linha = []
-        #     for coord in group:
-        #         j = coord[1]
-        #         valor = input_dict[coord]
-        #         linha.append(f"(({i}, {j}), {valor})")  # Formato desejado
-        #     print(", ".join(linha))  # Junta os elementos da linha com vírgulas    
-
-        # Algoritmo de divisão baseado em centro de massa e autovetores
         result = recursive_binary_subset_division_balanced(input_dict, n_subsets)
         
         # Avalia a qualidade da partição
