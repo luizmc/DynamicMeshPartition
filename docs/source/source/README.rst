@@ -1,5 +1,5 @@
-Dynamic Mesh Partition
-======================
+Bisseção Recursiva
+==================
 
 Códigos relativos ao artigo *"Dynamic Mesh Partitioning For Improving Linear Solver Load Balancing In Compositional Aim Simulations"* de J.R.P. Rodrigues e L.S. Gasparini.
 
@@ -104,65 +104,78 @@ Diretório `Exemplos`
 ====================
 
 Contém casos de uso práticos e scripts demonstrativos.  
-:doc:`Consulte o README <Exemplos/README>` neste diretório para instruções detalhadas e exemplos de aplicação.
+:ref:`readmeexemplos` neste diretório para instruções detalhadas e exemplos de aplicação.
 
 ---
 
 Exemplos de Uso
 ===============
 
-Criação de uma malha 3D básica:
-```python
-mesh = create_3d_mesh()
-print(mesh.shape)  # Saída: (8, 8, 3)
-```
+1. Criação de uma malha 3D básica:
 
-Criação de uma malha com intervalos customizados:
-```python
-custom_intervals = {
-0: {2: [(3, 4)], 3: [(2, 5)]},
-1: {1: [(2, 5)], 2: [(1, 6)]}
-}
-mesh = create_3d_mesh(active_intervals=custom_intervals)
-```
+.. code-block:: python
 
-Refinamento de uma malha 3D:
-```python
-mesh = create_3d_mesh(8, 8, 3)
-regions = {
-1: {  # camada Z=1
-3: [(2, 4, 2, 2, 1), (5, 6, 3, 1, 1)],  # linha X=3 com dois intervalos
-4: [(3, 5, 2, 3, 1)]  # linha X=4 com um intervalo
-}
-}
-refined_mesh = refine_mesh(mesh, regions)
-```
+    mesh = create_3d_mesh()
+    print(mesh.shape)  # Saída: (8, 8, 3)
 
-Cálculo de matriz de inércia e visualização:
-```python
-mesh = create_3d_mesh()
-weights = compute_weight_array(mesh)
-I, cm = compute_inertia_matrix_from_grid(weights)
-moments, axes = calculate_principal_moments(I)
-fig, ax = visualize_inertia_deformation(moments, axes)
-plt.show()
-```
+2. Criação de uma malha com intervalos customizados:
 
-Particionamento de uma malha usando bissecção balanceada:
-```python
-# Gerar dicionário de entrada
-input_dict = generate_input_synthetic_dictionary(10, 10)
+.. code-block:: python
 
-# Particionar em 4 subconjuntos balanceados
-result = recursive_binary_subset_division_balanced(input_dict, 4)
+    custom_intervals = {
+    0: {2: [(3, 4)], 3: [(2, 5)]},
+    1: {1: [(2, 5)], 2: [(1, 6)]}
+    }
+    mesh = create_3d_mesh(active_intervals=custom_intervals)
 
-# Avaliar a qualidade da partição
-quality = evaluate_partition_quality(result, input_dict)
-print(f"Desvio de peso: {quality['weight_percentage_range']}%")
+3. Refinamento de uma malha 3D:
 
-# Converter para matriz de atribuição
-domain_assignment = convert_result_to_domain_assignment(result, 10, 10)
-```
+.. code-block:: python
+
+    mesh = create_3d_mesh(8, 8, 3)
+    regions = {
+    1: {  # camada Z=1
+    3: [(2, 4, 2, 2, 1), (5, 6, 3, 1, 1)],  # linha X=3 com dois intervalos
+    4: [(3, 5, 2, 3, 1)]  # linha X=4 com um intervalo
+    }
+    }
+    refined_mesh = refine_mesh(mesh, regions)
+
+4. Cálculo de matriz de inércia e visualização:
+
+.. code-block:: python
+
+    mesh = create_3d_mesh()
+    weights = compute_weight_array(mesh)
+    I, cm = compute_inertia_matrix_from_grid(weights)
+    moments, axes = calculate_principal_moments(I)
+    fig, ax = visualize_inertia_deformation(moments, axes)
+    plt.show()
+
+
+5. Particionamento de uma malha usando bissecção balanceada:
+
+.. code-block:: python
+
+    # Gerar dicionário de entrada
+    input_dict = generate_input_synthetic_dictionary(10, 10)
+    # Particionar em 4 subconjuntos balanceados
+    result = recursive_binary_subset_division_balanced(input_dict, 4)
+
+
+6.  Avaliar a qualidade da partição
+
+.. code-block:: python
+
+    quality = evaluate_partition_quality(result, input_dict)
+    print(f"Desvio de peso: {quality['weight_percentage_range']}%")
+    print(f"Variância: {quality['variance']}")
+
+7. Converter para matriz de atribuição
+
+.. code-block:: python
+
+    domain_assignment = convert_result_to_domain_assignment(result, 10, 10)
 
 ---
 
