@@ -188,34 +188,60 @@ def find_best_projection_and_division_balanced(input_dict, n1, n2):
     
     # Helper functions for connectivity
     def is_connected(subset):
-        """Check if a subset of coordinates forms a connected component"""
+        """
+        Verifica se um subconjunto de coordenadas forma um componente conectado.
+        
+        Esta função determina se todas as coordenadas no subconjunto fornecido
+        podem ser alcançadas a partir de qualquer outra coordenada, movendo-se
+        apenas entre vizinhos adjacentes (acima, abaixo, esquerda, direita).
+
+        Esta função implementa um algoritmo de busca em largura (BFS) para verificar a conectividade de um conjunto de coordenadas. A ideia principal é começar em um ponto e verificar se todos os outros pontos podem ser alcançados seguindo apenas movimentos adjacentes.
+       
+        Args:
+            subset: Um dicionário onde as chaves são tuplas (i, j) representando coordenadas.
+                    Os valores do dicionário não são utilizados nesta função.
+        
+        Returns:
+            bool: True se o subconjunto forma um componente conectado, False caso contrário.
+        """
+        # Caso base: um conjunto vazio é considerado conectado por definição
         if not subset:
             return True
         
+        # Extrai todas as coordenadas do subconjunto
         coords = list(subset.keys())
-        visited = set()
-        queue = [coords[0]]
-        visited.add(coords[0])
         
+        # Inicializa estruturas para o algoritmo de busca em largura (BFS)
+        visited = set()  # Conjunto para rastrear coordenadas já visitadas
+        queue = [coords[0]]  # Fila começa com a primeira coordenada
+        visited.add(coords[0])  # Marca a primeira coordenada como visitada
+        
+        # Implementação do algoritmo BFS para explorar o componente conectado
         while queue:
+            # Remove e processa a próxima coordenada da fila
             current = queue.pop(0)
             i, j = current
+            
+            # Gera as quatro coordenadas adjacentes (vizinhos)
+            # Vizinhos: direita, esquerda, abaixo, acima
             neighbors = [(i+1, j), (i-1, j), (i, j+1), (i, j-1)]
             
+            # Processa cada vizinho
             for neighbor in neighbors:
+                # Verifica se o vizinho está no subconjunto e ainda não foi visitado
                 if neighbor in subset and neighbor not in visited:
-                    visited.add(neighbor)
-                    queue.append(neighbor)
+                    visited.add(neighbor)  # Marca o vizinho como visitado
+                    queue.append(neighbor)  # Adiciona o vizinho à fila para processamento posterior
         
-        return len(visited) == len(subset)
-    
+        # Um componente é conectado se todas as coordenadas foram visitadas
+        # durante a busca em largura a partir da primeira coordenada
+        return len(visited) == len(subset)    
+        
     # Try different cut points to find a balanced division that maintains connectivity
     best_imbalance = float('inf')
     best_first_subset = {}
     best_second_subset = {}
     
- 
-    # Modificar esta parte:
     for cut_index in range(1, len(sorted_coords)):
         # Create two potential subsets
         first_subset = {sorted_coords[i]: input_dict[sorted_coords[i]] for i in range(cut_index)}
