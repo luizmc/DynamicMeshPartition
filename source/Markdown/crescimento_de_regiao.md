@@ -183,7 +183,9 @@ def region_growing_partition(input_dict, n1, n2, sorted_coords):
             # Caso contrário, adiciona ao segundo subconjunto
             second_subset[coord] = input_dict[coord]
   
-    return first_subset, second_subset```
+    return first_subset, second_subset
+```
+
 ## Teoria Subjacente
 
 Do ponto de vista teórico, este algoritmo relaciona-se com:
