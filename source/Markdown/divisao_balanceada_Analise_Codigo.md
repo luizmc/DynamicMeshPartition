@@ -5,6 +5,7 @@ Este documento explica o racional, os algoritmos e as referências para a funç�
 ## Racional do Algoritmo
 
 O objetivo principal deste algoritmo é encontrar uma divisão equilibrada de um conjunto de pontos que:
+
 1. Mantenha conectividade espacial em cada subconjunto
 2. Balance os pesos entre os subconjuntos de acordo com uma proporção alvo (n1:n2)
 3. Produza divisões que sejam naturais em relação à estrutura geométrica dos dados

@@ -349,7 +349,7 @@ def region_growing_partition(input_dict, n1, n2, sorted_coords):
     while len(assigned) < len(input_dict):
         # Obtém os vizinhos não atribuídos de cada subconjunto
         first_neighbors = get_unassigned_neighbors(first_subset)
-        second_neighbors = get_unassigned_neighbors(second_neighbors)
+        second_neighbors = get_unassigned_neighbors(second_subset)
         
         # Se nenhum dos subconjuntos tiver vizinhos não atribuídos, encerra o loop
         # (pode acontecer se houver regiões desconectadas no espaço)
