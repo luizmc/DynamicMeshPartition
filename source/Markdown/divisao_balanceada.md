@@ -236,7 +236,7 @@ Para detectar estas falhas, o algoritmo tenta todos os possíveis pontos de cort
 
 ### Estratégia de Fallback
 
-Quando o algoritmo principal falha, a função `region_growing_partition` é chamada como uma estratégia de fallback. Esta função implementa um algoritmo de crescimento de região que:
+Quando o algoritmo principal falha, a função [region_growing_partition](crescimento_de_regiao.md) é chamada como uma estratégia de fallback. Esta função implementa um algoritmo de crescimento de região que:
 
 1. Inicia com duas "sementes" nos extremos opostos da projeção
 2. Gradualmente expande cada região anexando vizinhos adjacentes
@@ -245,7 +245,7 @@ Quando o algoritmo principal falha, a função `region_growing_partition` é cha
 
 Este método é mais robusto para formas complexas, pois não depende de um corte linear e pode criar divisões que seguem contornos naturais da forma. No entanto, é geralmente mais computacionalmente intensivo e pode resultar em fronteiras menos regulares entre os subconjuntos.
 
-A escolha de usar `region_growing_partition` como fallback é estratégica: tenta-se primeiro o método mais eficiente (corte ao longo do eixo principal), mas havendo falha, recorre-se a um método mais robusto embora potencialmente mais custoso.
+A escolha de usar [region_growing_partition](crescimento_de_regiao.md) como fallback é estratégica: tenta-se primeiro o método mais eficiente (corte ao longo do eixo principal), mas havendo falha, recorre-se a um método mais robusto embora potencialmente mais custoso.
 
 ## Relação com Algoritmos Clássicos
 
@@ -307,4 +307,4 @@ Esta evolução indica uma escolha deliberada de priorizar o balanceamento de pe
 
 ## Conclusão
 
-O algoritmo `find_best_projection_and_division_balanced` representa uma abordagem sofisticada para o problema de particionamento espacial com restrições, combinando princípios de mecânica, análise espectral e teoria dos grafos. A utilização dos eixos principais de inércia para guiar a divisão permite que o algoritmo identifique partições que respeitam a estrutura natural dos dados, enquanto as verificações de conectividade e os critérios de balanceamento garantem partições práticas e úteis para aplicações do mundo real. O mecanismo de fallback que chama `region_growing_partition` proporciona robustez adicional, garantindo que o algoritmo funcione mesmo em casos onde a abordagem de corte simples falha.
+O algoritmo `find_best_projection_and_division_balanced` representa uma abordagem sofisticada para o problema de particionamento espacial com restrições, combinando princípios de mecânica, análise espectral e teoria dos grafos. A utilização dos eixos principais de inércia para guiar a divisão permite que o algoritmo identifique partições que respeitam a estrutura natural dos dados, enquanto as verificações de conectividade e os critérios de balanceamento garantem partições práticas e úteis para aplicações do mundo real. O mecanismo de fallback que chama [region_growing_partition](crescimento_de_regiao.md) proporciona robustez adicional, garantindo que o algoritmo funcione mesmo em casos onde a abordagem de corte simples falha.

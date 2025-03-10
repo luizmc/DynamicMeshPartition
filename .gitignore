@@ -169,3 +169,10 @@ cython_debug/
 
 # PyPI configuration file
 .pypirc
+
+# Jabref metadata file
+.bib.sav
+.bib.bak
+
+# Referências bibliográficas
+/Fontes
