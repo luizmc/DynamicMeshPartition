@@ -29,6 +29,8 @@ source_dir = os.path.join(parent_dir, "source")
 sys.path.append(source_dir)
 # Agora você pode importar os módulos do diretório 'source'
 import mesh3d as m3d
+import mesh_interface as mi
+
 
 def main():
     """
@@ -56,7 +58,7 @@ def main():
         :func:`mesh3d.create_3d_mesh` para detalhes de implementação
     """
     mesh = m3d.create_3d_mesh()
-
+ #   mesh = mi.open_mesh_interface()
 
     """
     Dicionário de refinamentos com estrutura:

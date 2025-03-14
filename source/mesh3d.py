@@ -4,8 +4,13 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d.art3d import Poly3DCollection
 from matplotlib.colors import Normalize
 from matplotlib import colormaps
-
-
+import tkinter as tk
+from tkinter import ttk, messagebox
+import json
+import ast
+from matplotlib.figure import Figure
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+  
 def create_3d_mesh(nx=8, ny=8, nz=3, active_intervals=None):
     """
     Cria uma malha 3D logicamente retangular, definindo células ativas por intervalos variáveis por linha e camada.
@@ -166,125 +171,6 @@ def compute_weight_array(mesh):
     weight_array = np.sum(mesh, axis=2)  # Soma ao longo do eixo Z
     return weight_array
 
-def plot_3d_mesh_with_weights_old(mesh):
-    """
-    Plota a malha 3D mostrando as células ativas com base nos pesos.
-    
-    As células ativas são mostradas em azul com transparência, enquanto as células
-    inativas são mostradas em vermelho claro com alta transparência.
-    
-    Parameters
-    ----------
-    mesh : numpy.ndarray
-        Array tridimensional representando a malha 3D, onde valores positivos
-        indicam células ativas.
-    
-    Returns
-    -------
-    None
-        A função cria e exibe um gráfico 3D, mas não retorna nenhum valor.
-    
-    Notes
-    -----
-    Esta função usa a biblioteca Matplotlib para criar uma visualização 3D da malha.
-    As células são representadas como cubos com cores diferentes dependendo do seu estado.
-    """
-    fig = plt.figure()
-    ax = fig.add_subplot(111, projection='3d')
-    
-    # Define cores para células ativas e inativas
-    active_color = (0, 0, 1, 0.5)  # Azul com transparência
-    inactive_color = (1, 0, 0, 0.01)  # Vermelho claro com transparência
-
-    # Dimensões da malha
-    nx, ny, nz = mesh.shape
-
-    # Função para criar vértices de um cubo
-    def cubo_vertices(x, y, z):
-        """
-        Retorna os vértices de um cubo dadas as coordenadas de um dos seus vértices.
-        
-        Parameters
-        ----------
-        x : int
-            Coordenada X do vértice inicial.
-        y : int
-            Coordenada Y do vértice inicial.
-        z : int
-            Coordenada Z do vértice inicial.
-            
-        Returns
-        -------
-        list
-            Lista com as coordenadas dos 8 vértices do cubo.
-        """
-        # Return a list of the coordinates of the vertices of the cube
-        return [
-            [x, y, z],
-            [x + 1, y, z],
-            [x + 1, y + 1, z],
-            [x, y + 1, z],
-            [x, y, z + 1],
-            [x + 1, y, z + 1],
-            [x + 1, y + 1, z + 1],
-            [x, y + 1, z + 1]
-        ]
-
-    # Função para criar faces de um cubo a partir dos vértices
-    def cubo_faces(verts):
-        """
-        Retorna as faces de um cubo a partir dos seus vértices.
-        
-        Parameters
-        ----------
-        verts : list
-            Lista com as coordenadas dos 8 vértices do cubo.
-            
-        Returns
-        -------
-        list
-            Lista com as 6 faces do cubo, onde cada face é uma lista de 4 vértices.
-        """
-        # Return a list of faces, each face is a list of vertices
-        return [
-            # First face: top face
-            [verts[0], verts[1], verts[5], verts[4]],
-            # Second face: bottom face
-            [verts[7], verts[6], verts[2], verts[3]],
-            # Third face: front face
-            [verts[0], verts[3], verts[7], verts[4]],
-            # Fourth face: back face
-            [verts[1], verts[2], verts[6], verts[5]],
-            # Fifth face: left face
-            [verts[0], verts[1], verts[2], verts[3]],
-            # Sixth face: right face
-            [verts[4], verts[5], verts[6], verts[7]]
-        ]
-
-    # Percorre todas as células da malha
-    for i in range(nx):
-        for j in range(ny):
-            for k in range(nz):
-                # Obtém os vértices do cubo na posição (i, j, k)
-                verts = cubo_vertices(i, j, k)
-                faces = cubo_faces(verts)
-                # Define a cor com base no peso
-                color = active_color if mesh[i, j, k] > 0 else inactive_color
-                # Cria a coleção de polígonos para as faces do cubo
-                poly3d = Poly3DCollection(faces, facecolors=color, linewidths=0.1, edgecolors='k')
-                ax.add_collection3d(poly3d)
-
-    # Configurações do gráfico
-    ax.set_xlabel('X')
-    ax.set_ylabel('Y')
-    ax.set_zlabel('Z')
-    ax.set_xlim(0, nx)
-    ax.set_ylim(0, ny)
-    ax.set_zlim(0, nz)
-    ax.view_init(elev=20, azim=30)  # Ajusta a visualização 3D
-
-
-
 def plot_weights(weight_array):
     """
     Plota a matriz de pesos como uma imagem 2D colorida com os valores sobrepostos.
@@ -378,7 +264,22 @@ def plot_3d_mesh_with_weights(mesh, show_refinement=False):
     def cubo_vertices(x, y, z):
         """
         Retorna os vértices de um cubo dadas as coordenadas de um dos seus vértices.
+        
+        Parameters
+        ----------
+        x : int
+            Coordenada X do vértice inicial.
+        y : int
+            Coordenada Y do vértice inicial.
+        z : int
+            Coordenada Z do vértice inicial.
+            
+        Returns
+        -------
+        list
+            Lista com as coordenadas dos 8 vértices do cubo.
         """
+
         return [
             [x, y, z],
             [x + 1, y, z],
@@ -394,7 +295,18 @@ def plot_3d_mesh_with_weights(mesh, show_refinement=False):
     def cubo_faces(verts):
         """
         Retorna as faces de um cubo a partir dos seus vértices.
+        
+        Parameters
+        ----------
+        verts : list
+            Lista com as coordenadas dos 8 vértices do cubo.
+            
+        Returns
+        -------
+        list
+            Lista com as 6 faces do cubo, onde cada face é uma lista de 4 vértices.
         """
+   
         return [
             # First face: top face
             [verts[0], verts[1], verts[5], verts[4]],
