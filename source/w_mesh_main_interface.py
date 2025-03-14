@@ -5,8 +5,8 @@ from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.colors import ListedColormap
 
-from mesh_interface import MeshInterfaceApp
-from refined_mesh_interface import RefinementInterfaceApp
+from w_mesh_interface import MeshInterfaceApp
+from w_refined_mesh_interface import RefinementInterfaceApp
 from mesh3d import refine_mesh, create_3d_mesh  # Certifique-se de ter mesh3d.py in the same directory
 
 class MainApp:
